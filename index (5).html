@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Appointment Booking</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .section { 
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+    
+    label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 5px;
+      margin-top: 15px;
+    }
+    
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="text"]:focus, input[type="date"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    .doctor-card { 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border: none;
+      padding: 25px;
+      margin: 20px 0;
+      cursor: pointer;
+      border-radius: 15px;
+      transition: all 0.4s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .doctor-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .doctor-card h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.6em;
+    }
+    
+    .doctor-card p {
+      color: #555;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    
+    .select-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 15px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .select-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .response-message {
+      margin-top: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      border-left: 4px solid #28a745;
+      border-radius: 8px;
+      color: #155724;
+      animation: slideIn 0.4s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .time-slots-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .time-slot-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border: 3px solid #28a745;
+      padding: 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .time-slot-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      transition: all 0.4s ease;
+      z-index: 0;
+    }
+    
+    .time-slot-card:hover::before {
+      left: 0;
+    }
+    
+    .time-slot-card:hover {
+      color: white;
+      border-color: #20c997;
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    }
+    
+    .time-slot-card strong,
+    .time-slot-card span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .time-slot-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 450px;
+      width: 90%;
+      animation: slideUp 0.4s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-content h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.8em;
+    }
+    
+    .modal-content p {
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .modal-content input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-content input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .confirm-btn {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    }
+    
+    .confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+    }
+    
+    .cancel-btn {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .cancel-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.6);
+    }
+    
+    .booking-response {
+      margin-top: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+      border-left: 5px solid #17a2b8;
+      border-radius: 10px;
+      color: #0c5460;
+      font-size: 16px;
+      line-height: 1.8;
+      box-shadow: 0 5px 15px rgba(23, 162, 184, 0.2);
+      animation: slideIn 0.4s ease;
+    }
+    
+    .date-picker-container {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 2px solid #667eea;
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+      
+      .section {
+        padding: 20px;
+      }
+      
+      .time-slots-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Doctor Appointment Booking</h1>
+  
+  <div class="section">
+    <h2>Search Doctors</h2>
+    <label>Department:</label>
+    <input type="text" id="department" placeholder="e.g., Cardiology, Neurology">
+    
+    <label>Expertise:</label>
+    <input type="text" id="expertise" placeholder="e.g., Heart Surgery, Echocardiography">
+    
+    <div class="date-picker-container">
+      <label>Select Appointment Date:</label>
+      <input type="date" id="appointmentDate">
+    </div>
+    
+    <button onclick="searchDoctors()">Search Doctors</button>
+    
+    <div id="doctorResults"></div>
+  </div>
+  
+  <div id="nameModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Enter Your Name</h3>
+      <p>Please provide your name to book the appointment:</p>
+      <input type="text" id="patientNameInput" placeholder="Your full name">
+      <div class="modal-buttons">
+        <button class="modal-btn confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+        <button class="modal-btn cancel-btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  let currentBookingData = {};
+  
+  // Set date picker constraints on page load
+  window.onload = function() {
+    const dateInput = document.getElementById("appointmentDate");
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+    
+    // Format dates as YYYY-MM-DD
+    const todayStr = today.toISOString().split('T')[0];
+    const maxDateStr = maxDate.toISOString().split('T')[0];
+    
+    dateInput.min = todayStr;
+    dateInput.max = maxDateStr;
+    dateInput.value = todayStr; // Set default to today
+  };
+  
+  function searchDoctors() {
+    const department = document.getElementById("department").value;
+    const expertise = document.getElementById("expertise").value;
+    const selectedDate = document.getElementById("appointmentDate").value;
+    
+    if (!selectedDate) {
+      alert("Please select an appointment date");
+      return;
+    }
+    
+    const webhookUrl = "https://hook.eu2.make.com/3izdp52jn7fl724v9r2tpmjkktho2hlu";
+    
+    const data = {
+      department: department,
+      expertise: expertise
+    };
+    
+    fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.text())
+    .then(text => {
+      const result = JSON.parse(text);
+      let expertiseList = "";
+      if (Array.isArray(result.expertise)) {
+        expertiseList = result.expertise
+          .map((exp, i) => `Expertise ${i + 1}: ${exp.trim()}`)
+          .join("<br>");
+      }
+      const output = `
+        <div class="doctor-card" onclick="selectDoctor('${result.doctor_id}')">
+          <h3>${result.name}</h3>
+          <p><strong>ID:</strong> ${result.doctor_id}</p>
+          <p><strong>Department:</strong> ${result.department}</p>
+          <p><strong>Expertise:</strong><br>${expertiseList}</p>
+          <button class="select-btn" onclick="event.stopPropagation(); selectDoctor('${result.doctor_id}')">Select Doctor</button>
+          <div id="responseMessage"></div>
+        </div>
+      `;
+      document.getElementById("doctorResults").innerHTML = output;
+    })
+    .catch(error => {
+      document.getElementById("doctorResults").innerText = "Error: " + error;
+    });
+  }
+
+  function selectDoctor(doctorId) {
+    const selectedDate = document.getElementById("appointmentDate").value;
+    
+    if (!selectedDate) {
+      alert("Please select an appointment date");
+      return;
+    }
+    
+    const webhookUrl = "https://hook.eu2.make.com/s9ofd3whbswz7pkwz9dj7bwwbxm0m4ln";
+    
+    const data = {
+      doctor_id: doctorId,
+      date: selectedDate
+    };
+    
+    fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.text())
+    .then(text => {
+      let displayContent = "";
+      
+      try {
+        const jsonData = JSON.parse(text);
+        
+        if (jsonData.time_slot1 || jsonData.time_slot2 || jsonData.time_slot3) {
+          displayContent = "<strong>Available Time Slots:</strong><br><div class='time-slots-container'>";
+          
+          if (jsonData.time_slot1) {
+            displayContent += `
+              <div class="time-slot-card" onclick="selectTimeSlot('${doctorId}', 'time_slot1', '${jsonData.time_slot1}')">
+                <strong>Slot 1</strong><br><span>${jsonData.time_slot1}</span>
+              </div>`;
+          }
+          if (jsonData.time_slot2) {
+            displayContent += `
+              <div class="time-slot-card" onclick="selectTimeSlot('${doctorId}', 'time_slot2', '${jsonData.time_slot2}')">
+                <strong>Slot 2</strong><br><span>${jsonData.time_slot2}</span>
+              </div>`;
+          }
+          if (jsonData.time_slot3) {
+            displayContent += `
+              <div class="time-slot-card" onclick="selectTimeSlot('${doctorId}', 'time_slot3', '${jsonData.time_slot3}')">
+                <strong>Slot 3</strong><br><span>${jsonData.time_slot3}</span>
+              </div>`;
+          }
+          
+          displayContent += "</div>";
+        } else {
+          displayContent = "<strong>Response:</strong><br>";
+          for (const [key, value] of Object.entries(jsonData)) {
+            displayContent += `<strong>${key}:</strong> ${value}<br>`;
+          }
+        }
+      } catch (e) {
+        displayContent = text;
+      }
+      
+      const responseDiv = document.getElementById("responseMessage");
+      if (responseDiv) {
+        responseDiv.innerHTML = `<div class="response-message">${displayContent}</div>`;
+      } else {
+        document.getElementById("doctorResults").innerHTML += `<div class="response-message">${displayContent}</div>`;
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      const responseDiv = document.getElementById("responseMessage");
+      if (responseDiv) {
+        responseDiv.innerHTML = `<div class="response-message" style="background-color: #f8d7da; border-color: #f5c6cb; color: #721c24;">Error: ${error}</div>`;
+      }
+    });
+  }
+
+  function selectTimeSlot(doctorId, slotName, slotTime) {
+    const selectedDate = document.getElementById("appointmentDate").value;
+    
+    currentBookingData = {
+      doctor_id: doctorId,
+      date: selectedDate,
+      time: slotTime,
+      slotName: slotName
+    };
+    
+    document.getElementById("nameModal").style.display = "flex";
+    document.getElementById("patientNameInput").value = "";
+    document.getElementById("patientNameInput").focus();
+  }
+  
+function closeModal() {
+  document.getElementById("nameModal").style.display = "none";
+  // ❌ Don't reset currentBookingData here
+}
+
+function confirmBooking() {
+  const patientName = document.getElementById("patientNameInput").value.trim();
+    
+  if (!patientName) {
+    alert("Please enter your name");
+    return;
+  }
+
+  const webhookUrl = "https://hook.eu2.make.com/gmzf0etr6nkyrxe1mdruaytql4202kfs";
+
+  const data = {
+    doctor_id: currentBookingData.doctor_id,
+    date: currentBookingData.date,
+    time: currentBookingData.time,
+    patient: patientName
+  };
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.text())
+  .then(text => {
+    const responseDiv = document.getElementById("responseMessage");
+    if (responseDiv) {
+      responseDiv.innerHTML += `<div class="booking-response">${text}</div>`;
+    }
+    console.log("Booking Response:", text);
+
+    // ✅ clear booking data only after sending
+    currentBookingData = {};
+    closeModal();
+  })
+  .catch(error => {
+    console.error("Error:", error);
+    const responseDiv = document.getElementById("responseMessage");
+    if (responseDiv) {
+      responseDiv.innerHTML += `<div class="booking-response" style="background-color: #f8d7da; border-color: #dc3545; color: #721c24;">Error booking appointment: ${error}</div>`;
+    }
+  });
+}
+
+  
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && document.getElementById("nameModal").style.display === "flex") {
+      confirmBooking();
+    }
+  });
+  </script>
+</body>
+</html>
