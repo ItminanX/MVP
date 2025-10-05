@@ -386,72 +386,106 @@
   
   <script>
   let currentBookingData = {};
+  let currentDoctorId = null;
   
-  // Set date picker constraints on page load
   window.onload = function() {
     const dateInput = document.getElementById("appointmentDate");
     const today = new Date();
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 7);
     
-    // Format dates as YYYY-MM-DD
     const todayStr = today.toISOString().split('T')[0];
     const maxDateStr = maxDate.toISOString().split('T')[0];
     
     dateInput.min = todayStr;
     dateInput.max = maxDateStr;
-    dateInput.value = todayStr; // Set default to today
+    dateInput.value = todayStr;
   };
   
   function searchDoctors() {
-    const department = document.getElementById("department").value;
-    const expertise = document.getElementById("expertise").value;
-    const selectedDate = document.getElementById("appointmentDate").value;
+  const department = document.getElementById("department").value;
+  const expertise = document.getElementById("expertise").value;
+  const selectedDate = document.getElementById("appointmentDate").value;
+  
+  if (!selectedDate) {
+    alert("Please select an appointment date");
+    return;
+  }
+  
+  const webhookUrl = "https://hook.eu2.make.com/3izdp52jn7fl724v9r2tpmjkktho2hlu";
+  
+  const data = {
+    department: department,
+    expertise: expertise
+  };
+  
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.text())
+  .then(text => {
+    const result = JSON.parse(text);
+    let output = "";
     
-    if (!selectedDate) {
-      alert("Please select an appointment date");
-      return;
-    }
-    
-    const webhookUrl = "https://hook.eu2.make.com/3izdp52jn7fl724v9r2tpmjkktho2hlu";
-    
-    const data = {
-      department: department,
-      expertise: expertise
-    };
-    
-    fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-    .then(response => response.text())
-    .then(text => {
-      const result = JSON.parse(text);
+    // Check if result has a doctors array
+    if (result.doctors && Array.isArray(result.doctors)) {
+      // Multiple doctors
+      result.doctors.forEach(doctor => {
+        let expertiseList = "";
+        // Handle comma-separated string
+        if (typeof doctor.expertise === 'string') {
+          expertiseList = doctor.expertise.split(',')
+            .map((exp, i) => `Expertise ${i + 1}: ${exp.trim()}`)
+            .join("<br>");
+        }
+        
+        output += `
+          <div class="doctor-card" onclick="selectDoctor('${doctor.doctor_id}')">
+            <h3>${doctor.name}</h3>
+            <p><strong>ID:</strong> ${doctor.doctor_id}</p>
+            <p><strong>Department:</strong> ${doctor.department}</p>
+            <p><strong>Expertise:</strong><br>${expertiseList}</p>
+            <button class="select-btn" onclick="event.stopPropagation(); selectDoctor('${doctor.doctor_id}')">Select Doctor</button>
+            <div id="responseMessage_${doctor.doctor_id}"></div>
+          </div>
+        `;
+      });
+    } else {
+      // Single doctor (backward compatibility)
       let expertiseList = "";
-      if (Array.isArray(result.expertise)) {
+      if (typeof result.expertise === 'string') {
+        expertiseList = result.expertise.split(',')
+          .map((exp, i) => `Expertise ${i + 1}: ${exp.trim()}`)
+          .join("<br>");
+      } else if (Array.isArray(result.expertise)) {
         expertiseList = result.expertise
           .map((exp, i) => `Expertise ${i + 1}: ${exp.trim()}`)
           .join("<br>");
       }
-      const output = `
+      
+      output = `
         <div class="doctor-card" onclick="selectDoctor('${result.doctor_id}')">
           <h3>${result.name}</h3>
           <p><strong>ID:</strong> ${result.doctor_id}</p>
           <p><strong>Department:</strong> ${result.department}</p>
           <p><strong>Expertise:</strong><br>${expertiseList}</p>
           <button class="select-btn" onclick="event.stopPropagation(); selectDoctor('${result.doctor_id}')">Select Doctor</button>
-          <div id="responseMessage"></div>
+          <div id="responseMessage_${result.doctor_id}"></div>
         </div>
       `;
-      document.getElementById("doctorResults").innerHTML = output;
-    })
-    .catch(error => {
-      document.getElementById("doctorResults").innerText = "Error: " + error;
-    });
-  }
+    }
+    
+    document.getElementById("doctorResults").innerHTML = output;
+  })
+  .catch(error => {
+    document.getElementById("doctorResults").innerText = "Error: " + error;
+  });
+}
 
   function selectDoctor(doctorId) {
+    currentDoctorId = doctorId;
     const selectedDate = document.getElementById("appointmentDate").value;
     
     if (!selectedDate) {
@@ -511,16 +545,14 @@
         displayContent = text;
       }
       
-      const responseDiv = document.getElementById("responseMessage");
+      const responseDiv = document.getElementById("responseMessage_" + doctorId);
       if (responseDiv) {
         responseDiv.innerHTML = `<div class="response-message">${displayContent}</div>`;
-      } else {
-        document.getElementById("doctorResults").innerHTML += `<div class="response-message">${displayContent}</div>`;
       }
     })
     .catch(error => {
       console.error("Error:", error);
-      const responseDiv = document.getElementById("responseMessage");
+      const responseDiv = document.getElementById("responseMessage_" + doctorId);
       if (responseDiv) {
         responseDiv.innerHTML = `<div class="response-message" style="background-color: #f8d7da; border-color: #f5c6cb; color: #721c24;">Error: ${error}</div>`;
       }
@@ -542,54 +574,51 @@
     document.getElementById("patientNameInput").focus();
   }
   
-function closeModal() {
-  document.getElementById("nameModal").style.display = "none";
-  // ❌ Don't reset currentBookingData here
-}
-
-function confirmBooking() {
-  const patientName = document.getElementById("patientNameInput").value.trim();
-    
-  if (!patientName) {
-    alert("Please enter your name");
-    return;
+  function closeModal() {
+    document.getElementById("nameModal").style.display = "none";
   }
 
-  const webhookUrl = "https://hook.eu2.make.com/gmzf0etr6nkyrxe1mdruaytql4202kfs";
-
-  const data = {
-    doctor_id: currentBookingData.doctor_id,
-    date: currentBookingData.date,
-    time: currentBookingData.time,
-    patient: patientName
-  };
-
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.text())
-  .then(text => {
-    const responseDiv = document.getElementById("responseMessage");
-    if (responseDiv) {
-      responseDiv.innerHTML += `<div class="booking-response">${text}</div>`;
+  function confirmBooking() {
+    const patientName = document.getElementById("patientNameInput").value.trim();
+    
+    if (!patientName) {
+      alert("Please enter your name");
+      return;
     }
-    console.log("Booking Response:", text);
 
-    // ✅ clear booking data only after sending
-    currentBookingData = {};
-    closeModal();
-  })
-  .catch(error => {
-    console.error("Error:", error);
-    const responseDiv = document.getElementById("responseMessage");
-    if (responseDiv) {
-      responseDiv.innerHTML += `<div class="booking-response" style="background-color: #f8d7da; border-color: #dc3545; color: #721c24;">Error booking appointment: ${error}</div>`;
-    }
-  });
-}
+    const webhookUrl = "https://hook.eu2.make.com/gmzf0etr6nkyrxe1mdruaytql4202kfs";
 
+    const data = {
+      doctor_id: currentBookingData.doctor_id,
+      date: currentBookingData.date,
+      time: currentBookingData.time,
+      patient: patientName
+    };
+
+    fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.text())
+    .then(text => {
+      const responseDiv = document.getElementById("responseMessage_" + currentBookingData.doctor_id);
+      if (responseDiv) {
+        responseDiv.innerHTML += `<div class="booking-response">${text}</div>`;
+      }
+      console.log("Booking Response:", text);
+
+      currentBookingData = {};
+      closeModal();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      const responseDiv = document.getElementById("responseMessage_" + currentBookingData.doctor_id);
+      if (responseDiv) {
+        responseDiv.innerHTML += `<div class="booking-response" style="background-color: #f8d7da; border-color: #dc3545; color: #721c24;">Error booking appointment: ${error}</div>`;
+      }
+    });
+  }
   
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && document.getElementById("nameModal").style.display === "flex") {
