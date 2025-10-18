@@ -271,29 +271,39 @@
         </div>
     </div>
 
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"></script>
 
-    <script type="module">
-        import { sendOTP, verifyOTP, backToPhone, checkAuthState } from './js/auth.js';
-        
-        // Make functions global
-        window.sendOTP = sendOTP;
-        window.verifyOTP = verifyOTP;
-        window.backToPhone = backToPhone;
-        
-        // Check if already logged in
-        checkAuthState();
-        
-        // Allow Enter key
-        document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+<!-- Your scripts -->
+<script type="module">
+    import { sendOTP, verifyOTP, backToPhone, checkAuthState } from './js/auth.js';
+    
+    // Make functions global
+    window.sendOTP = sendOTP;
+    window.verifyOTP = verifyOTP;
+    window.backToPhone = backToPhone;
+    
+    // Check if already logged in
+    checkAuthState();
+    
+    // Allow Enter key - with null checks
+    const phoneInput = document.getElementById('phoneInput');
+    const otpInput = document.getElementById('otpInput');
+    
+    if (phoneInput) {
+        phoneInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') sendOTP();
         });
-        
-        document.getElementById('otpInput').addEventListener('keypress', function(e) {
+    }
+    
+    if (otpInput) {
+        otpInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') verifyOTP();
         });
-    </script>
+    }
+</script>
+  
 </body>
 </html>
