@@ -39,9 +39,8 @@ export async function sendOTP() {
       phone = '+880' + phone;
     }
 
-    if (!/^\+88[01]\d{8}$/.test(phone)) {
-      showError('Invalid format. Use: 01234567890 or +8801234567890');
-      return;
+    if (!/^\+88[01]\d{8,9}$/.test(phone)) {
+      showError('Invalid format. Use: 01234567890 or +8801234567890 (10-11 digits)');
     }
 
     showSuccess('Sending OTP...');
