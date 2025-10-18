@@ -88,8 +88,10 @@ export async function verifyOTP() {
     }
 
     const verifyBtn = document.querySelector('[onclick="verifyOTP()"]');
-    verifyBtn.disabled = true;
-    verifyBtn.textContent = 'Verifying...';
+if (verifyBtn) {
+  verifyBtn.disabled = true;
+  verifyBtn.textContent = 'Verifying...';
+}
 
     const result = await confirmationResult.confirm(otpInput);
     const user = result.user;
@@ -113,11 +115,11 @@ export async function verifyOTP() {
       showError('Error: ' + error.message);
     }
 
-    const verifyBtn = document.querySelector('[onclick="verifyOTP()"]');
-    if (verifyBtn) {
-      verifyBtn.disabled = false;
-      verifyBtn.textContent = 'Verify OTP';
-    }
+   const verifyBtn = document.querySelector('[onclick="verifyOTP()"]');
+if (verifyBtn) {
+  verifyBtn.disabled = false;
+  verifyBtn.textContent = 'Verify OTP';
+}
   }
 }
 
