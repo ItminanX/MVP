@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0066cc, #00c896);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px;
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #b0b8d4;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e7ff;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #0099ff;
+            box-shadow: 0 0 0 3px rgba(0, 153, 255, 0.1);
+        }
+
+        input::placeholder {
+            color: #7a8299;
+        }
+
+        .phone-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 14px;
+            color: #b0b8d4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .phone-input-wrapper input {
+            flex: 1;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.15);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(0, 200, 150, 0.15);
+            border: 1px solid rgba(0, 200, 150, 0.3);
+            color: #00ff88;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0066cc, #0052a3);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 102, 204, 0.6);
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .button-secondary {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #b0b8d4;
+            box-shadow: none;
+        }
+
+        .button-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #recaptcha-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            transform: scale(0.9);
+            transform-origin: center;
+        }
+
+        #otpSection {
+            display: none;
+        }
+
+        .divider {
+            text-align: center;
+            color: #7a8299;
+            font-size: 12px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 500px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo">⚕️</div>
+            <h1>Patient Portal</h1>
+            <p class="subtitle">Your health, at your fingertips</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- Phone Section -->
+        <div id="phoneSection">
+            <div class="form-section">
+                <label for="phoneInput">Phone Number</label>
+                <div class="phone-input-wrapper">
+                    <div class="country-code">+880</div>
+                    <input 
+                        type="tel" 
+                        id="phoneInput" 
+                        placeholder="Enter your phone number"
+                        autocomplete="tel"
+                    >
+                </div>
+                <small style="color: #7a8299; margin-top: 6px; display: block;">
+                    Example: 1234567890 (without +880)
+                </small>
+            </div>
+
+            <div id="recaptcha-container"></div>
+
+            <button class="button" onclick="window.sendOTP()">Send OTP</button>
+
+            <p class="divider">First time? Create account after OTP verification</p>
+        </div>
+
+        <!-- OTP Section -->
+        <div id="otpSection">
+            <div class="form-section">
+                <label>Enter OTP</label>
+                <p style="color: #b0b8d4; font-size: 13px; margin-bottom: 12px;">
+                    We've sent a 6-digit code to your phone
+                </p>
+                <input 
+                    type="text" 
+                    id="otpInput" 
+                    placeholder="000000"
+                    maxlength="6"
+                    autocomplete="off"
+                    style="text-align: center; letter-spacing: 8px; font-size: 24px; font-weight: 600;"
+                >
+            </div>
+
+            <button class="button" onclick="window.verifyOTP()">Verify OTP</button>
+            <button class="button button-secondary" onclick="window.backToPhone()">Back</button>
+
+            <p class="divider">Didn't receive OTP?</p>
+            <button class="button button-secondary" onclick="window.sendOTP()">Resend OTP</button>
+        </div>
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js"></script>
+
+    <script type="module">
+        import { sendOTP, verifyOTP, backToPhone, checkAuthState } from './js/auth.js';
+        
+        // Make functions global
+        window.sendOTP = sendOTP;
+        window.verifyOTP = verifyOTP;
+        window.backToPhone = backToPhone;
+        
+        // Check if already logged in
+        checkAuthState();
+        
+        // Allow Enter key
+        document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendOTP();
+        });
+        
+        document.getElementById('otpInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyOTP();
+        });
+    </script>
+</body>
+</html>
