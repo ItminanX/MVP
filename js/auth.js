@@ -99,7 +99,7 @@ export async function verifyOTP() {
     
     // Redirect after 1 second
     setTimeout(() => {
-      window.location.href = 'index.html';
+      window.location.href = 'home.html';
     }, 1000);
 
   } catch (error) {
@@ -132,7 +132,7 @@ export function backToPhone() {
 export async function logout() {
   try {
     await signOut(auth);
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   } catch (error) {
     console.error('Error:', error);
     showError('Error logging out');
@@ -142,7 +142,7 @@ export async function logout() {
 export function checkAuthState() {
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      window.location.href = 'index.html';
+      window.location.href = 'home.html';
     }
   });
 }
