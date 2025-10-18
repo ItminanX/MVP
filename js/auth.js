@@ -100,7 +100,7 @@ if (verifyBtn) {
     
     // Redirect after 1 second
     setTimeout(() => {
-      window.location.href = 'home.html';
+      window.location.href = 'pages/home.html';
     }, 1000);
 
   } catch (error) {
@@ -143,7 +143,7 @@ export async function logout() {
 export function checkAuthState() {
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      window.location.href = 'home.html';
+      window.location.href = 'pages/home.html';
     }
   });
 }
