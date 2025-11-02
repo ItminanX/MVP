@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   signOut 
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 let confirmationResult = null;
 
@@ -41,6 +41,7 @@ export async function sendOTP() {
 
     if (!/^\+88[01]\d{8,9}$/.test(phone)) {
       showError('Invalid format. Use: 01234567890 or +8801234567890 (10-11 digits)');
+      return;
     }
 
     showSuccess('Sending OTP...');
@@ -87,21 +88,36 @@ export async function verifyOTP() {
       return;
     }
 
-    const verifyBtn = document.querySelector('[onclick="verifyOTP()"]');
-if (verifyBtn) {
-  verifyBtn.disabled = true;
-  verifyBtn.textContent = 'Verifying...';
-}
+    const verifyBtn = document.querySelector('[onclick="window.verifyOTP()"]');
+    if (verifyBtn) {
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying...';
+    }
 
     const result = await confirmationResult.confirm(otpInput);
     const user = result.user;
 
     showSuccess('Login successful!');
-    
-    // Redirect after 1 second
-    setTimeout(() => {
-      window.location.href = 'pages/home.html';
-    }, 1000);
+
+    // CHECK IF USER PROFILE EXISTS IN FIRESTORE
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      // NEW USER - Show profile modal
+      console.log('New user detected - showing profile modal');
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify OTP';
+      }
+      showProfileModal();
+    } else {
+      // EXISTING USER - Redirect to dashboard
+      console.log('Existing user - redirecting');
+      setTimeout(() => {
+        window.location.href = 'pages/home.html';
+      }, 1000);
+    }
 
   } catch (error) {
     console.error('Error:', error);
@@ -115,11 +131,75 @@ if (verifyBtn) {
       showError('Error: ' + error.message);
     }
 
-   const verifyBtn = document.querySelector('[onclick="verifyOTP()"]');
-if (verifyBtn) {
-  verifyBtn.disabled = false;
-  verifyBtn.textContent = 'Verify OTP';
+    const verifyBtn = document.querySelector('[onclick="window.verifyOTP()"]');
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify OTP';
+    }
+  }
 }
+
+// Show profile setup modal
+function showProfileModal() {
+  const modal = document.getElementById('profileModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    document.getElementById('userName').focus();
+  } else {
+    console.error('Profile modal not found');
+  }
+}
+
+// Save user profile to Firestore
+export async function saveProfile() {
+  const name = document.getElementById('userName').value.trim();
+  const age = document.getElementById('userAge').value.trim();
+  const gender = document.getElementById('userGender').value;
+  
+  // Validation
+  if (!name) {
+    showError('Please enter your name');
+    return;
+  }
+  
+  if (!age || age < 1 || age > 150) {
+    showError('Please enter a valid age');
+    return;
+  }
+  
+  if (!gender) {
+    showError('Please select your gender');
+    return;
+  }
+  
+  try {
+    showSuccess('Saving profile...');
+    
+    const user = auth.currentUser;
+    const userDocRef = doc(db, 'users', user.uid);
+    
+    // Create user document in Firestore
+    await setDoc(userDocRef, {
+      name: name,
+      age: parseInt(age),
+      gender: gender,
+      phone: user.phoneNumber,
+      userId: user.uid,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    
+    console.log('Profile saved successfully');
+    showSuccess('Profile created! Redirecting...');
+    
+    // Redirect to dashboard
+    setTimeout(() => {
+      window.location.href = 'pages/home.html';
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    showError('Failed to save profile. Please try again.');
   }
 }
 
@@ -133,7 +213,7 @@ export function backToPhone() {
 export async function logout() {
   try {
     await signOut(auth);
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
   } catch (error) {
     console.error('Error:', error);
     showError('Error logging out');
@@ -165,3 +245,6 @@ function showSuccess(message) {
     setTimeout(() => { successDiv.style.display = 'none'; }, 3000);
   }
 }
+
+// Make saveProfile available globally
+window.saveProfile = saveProfile;
