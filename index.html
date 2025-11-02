@@ -304,6 +304,71 @@
         });
     }
 </script>
-  
+ 
+    <!-- Profile Setup Modal -->
+<div id="profileModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="width: 100%; max-width: 480px; background: rgba(15, 23, 42, 0.98); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 40px; margin: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #0066cc, #00c896); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px; box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);">
+                👤
+            </div>
+            <h2 style="font-size: 26px; font-weight: 600; color: #fff; margin-bottom: 8px;">
+                Complete Your Profile
+            </h2>
+            <p style="font-size: 14px; color: #b0b8d4;">
+                We need a few details to personalize your experience
+            </p>
+        </div>
+
+        <div class="error-message" id="profileErrorMessage"></div>
+        <div class="success-message" id="profileSuccessMessage"></div>
+
+        <div class="form-section">
+            <label for="userName">Full Name</label>
+            <input 
+                type="text" 
+                id="userName" 
+                placeholder="Enter your full name"
+                autocomplete="name"
+            >
+        </div>
+
+        <div class="form-section">
+            <label for="userAge">Age</label>
+            <input 
+                type="number" 
+                id="userAge" 
+                placeholder="Enter your age"
+                min="1"
+                max="150"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="form-section">
+            <label for="userGender">Gender</label>
+            <select 
+                id="userGender" 
+                style="width: 100%; padding: 14px 16px; background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer;"
+            >
+                <option value="" style="background: #0f1729; color: #b0b8d4;">Select gender</option>
+                <option value="male" style="background: #0f1729; color: #fff;">Male</option>
+                <option value="female" style="background: #0f1729; color: #fff;">Female</option>
+                <option value="other" style="background: #0f1729; color: #fff;">Other</option>
+                <option value="prefer-not-to-say" style="background: #0f1729; color: #fff;">Prefer not to say</option>
+            </select>
+        </div>
+
+        <button class="button" onclick="window.saveProfile()" style="margin-top: 10px;">
+            Create Profile
+        </button>
+
+        <p style="text-align: center; font-size: 12px; color: #7a8299; margin-top: 20px;">
+            This information helps us provide better healthcare services
+        </p>
+    </div>
+</div>
+    
 </body>
 </html>
