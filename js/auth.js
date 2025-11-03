@@ -33,14 +33,34 @@ export async function sendOTP() {
       return;
     }
 
-    let phone = phoneInput;
-    if (!phone.startsWith('+')) {
-      if (phone.startsWith('0')) phone = phone.slice(1);
+    // Clean up the phone number - remove spaces, dashes, parentheses
+    let phone = phoneInput.replace(/[\s\-\(\)]/g, '');
+    
+    // If it already has +880, use as is
+    if (phone.startsWith('+880')) {
+      // Already formatted correctly
+    }
+    // If it starts with 880, add +
+    else if (phone.startsWith('880')) {
+      phone = '+' + phone;
+    }
+    // If it starts with 0, replace with +880
+    else if (phone.startsWith('0')) {
+      phone = '+880' + phone.slice(1);
+    }
+    // If it starts with 1, assume it's missing the leading 0 and country code
+    else if (phone.startsWith('1')) {
+      phone = '+880' + phone;
+    }
+    // Otherwise, just add +880
+    else {
       phone = '+880' + phone;
     }
 
-    if (!/^\+88[01]\d{8,9}$/.test(phone)) {
-      showError('Invalid format. Use: 01234567890 or +8801234567890 (10-11 digits)');
+    // Basic validation - just check if we have enough digits
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length < 11 || digitsOnly.length > 15) {
+      showError('Phone number should be 10-11 digits');
       return;
     }
 
@@ -60,7 +80,7 @@ export async function sendOTP() {
   } catch (error) {
     console.error('Error:', error);
     if (error.code === 'auth/invalid-phone-number') {
-      showError('Invalid phone number');
+      showError('Invalid phone number format. Try: 01712345678');
     } else if (error.code === 'auth/too-many-requests') {
       showError('Too many attempts. Try again later.');
     } else {
